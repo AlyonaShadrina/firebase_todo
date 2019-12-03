@@ -1,62 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { observer } from "mobx-react";
 
 import './App.css';
-import firebase from "./firebase";
-import Store from "./Counter";
+import State from "./State";
+import Auth from './auth/Auth';
 
 
 const App = observer(props => {
 
-    const { increase, decrease, count } = Store;
+    const { boards, getAllBoards, addBoard } = State;
 
-    const [list, setList] = useState([]);
-
-  const hadleSubmit = (e) => {
-    e.preventDefault();
-    const db = firebase.firestore();
-
-      db.collection("boards").get().then((querySnapshot) => {
-          const list = [];
-          querySnapshot.forEach((doc) => {
-              list.push(doc.data())
-          });
-          setList(list)
-      });
-
-    const userRef = db.collection('boards').add({
-      name: 'name 1',
-      description: 'description 1'
-    }).then((smth) => {
-      console.log('smth', smth.id);
+    const [values, setValues] = useState({
+        name: '',
+        description: '',
     });
 
-  };
+    const handleChange = (e) => {
+        e.persist();
+        setValues(oldObj => ({
+            ...oldObj,
+            [e.target.name]: e.target.value,
+        }))
+    };
+
+    useEffect(() => {
+        getAllBoards()
+    }, []);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        addBoard(values)
+    };
 
   return (
     <div className="App">
-        <h1>{count}</h1>
-        <button onClick={increase}>increment</button>
-        <button onClick={decrease}>decrease</button>
         <ul>
-            {list.map((item, i) => (
+            {boards.map((item, i) => (
                 <li key={i}>{item.name}</li>
             ))}
         </ul>
 
-      <form onSubmit={hadleSubmit}>
+      <form onSubmit={handleSubmit}>
         <input
             type="text"
-            name="fullname"
-            placeholder="Full name"
+            // value={values.name}
+            onChange={handleChange}
+            name="name"
+            placeholder="name"
         />
         <input
-            type="email"
-            name="email"
-            placeholder="Full name"
+            type="text"
+            // value={values.description}
+            onChange={handleChange}
+            name="description"
+            placeholder="description"
         />
         <button type="submit">Submit</button>
       </form>
+        <Auth />
     </div>
   );
 });
