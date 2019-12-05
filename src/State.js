@@ -15,7 +15,8 @@ class State {
     auth = firebase.auth();
 
     @observable boards = [];
-    @observable uid = [];
+    @observable uid = '';
+    @observable refreshToken = '';
 
     // @actionSetter decrease = () => {
     //     console.log(JSON.stringify(Object.entries(this)));
@@ -25,14 +26,10 @@ class State {
 
     @action signIn = ({email, password}) => {
         this.auth.signInWithEmailAndPassword(email, password).then((authInfo) => {
-            this.uid = authInfo.user.uid;
-        });
-    };
-
-    @action addBoard = (values) => {
-        this.db.collection('boards').add(values).then((smth) => {
-            console.log('smth', smth.id);
-            this.getAllBoards();
+            console.log('authInfo', authInfo);
+            const { uid, refreshToken } = authInfo.user;
+            this.uid = uid;
+            this.refreshToken = refreshToken;
         });
     };
 

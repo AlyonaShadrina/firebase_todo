@@ -1,25 +1,27 @@
-import { Collection, initFirestorter } from 'firestorter';
 import { observer } from 'mobx-react';
 import React from 'react';
 
-import firebase from '../firebase';
+import AddBoard from './AddBoard';
 import BoardItem from './BoardItem';
+import { boards } from './firestore';
 
-initFirestorter({ firebase: firebase });
-
-const todos = new Collection('boards');
 
 const BoardList = observer(() => {
-    const { docs, isLoading } = todos;
-    return <ul>
-        {isLoading ? <span>Loading...</span> : undefined}
-        {docs.map((doc) => (
-            <BoardItem
-                key={doc.id}
-                doc={doc}
-            />
-        ))}
-    </ul>;
+    const { docs, isLoading } = boards;
+    return (
+        <div>
+            <ul>
+                {isLoading ? <span>Loading...</span> : undefined}
+                {docs.map((doc) => (
+                    <BoardItem
+                        key={doc.id}
+                        doc={doc}
+                    />
+                ))}
+            </ul>
+            <AddBoard />
+        </div>
+    );
 });
 
 export default BoardList;
